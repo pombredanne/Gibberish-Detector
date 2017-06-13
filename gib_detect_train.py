@@ -1,4 +1,6 @@
 #!/usr/bin/python
+#
+# 12Jun2017 Petr Janata - added srcfile and outfile 
 
 import math
 import pickle
@@ -19,7 +21,7 @@ def ngram(n, l):
     for start in range(0, len(filtered) - n + 1):
         yield ''.join(filtered[start:start + n])
 
-def train():
+def train(srcfile='big.txt', outfile='gib_model.pki', goodfile='good.txt', badfile='bad.txt'):
     """ Write a simple model as a pickle file """
     k = len(accepted_chars)
     # Assume we have seen 10 of each character pair.  This acts as a kind of
@@ -30,7 +32,7 @@ def train():
 
     # Count transitions from big text file, taken 
     # from http://norvig.com/spell-correct.html
-    for line in open('big.txt'):
+    for line in open(srcfile):
         for a, b in ngram(2, line):
             counts[pos[a]][pos[b]] += 1
 
@@ -46,15 +48,15 @@ def train():
 
     # Find the probability of generating a few arbitrarily choosen good and
     # bad phrases.
-    good_probs = [avg_transition_prob(l, counts) for l in open('good.txt')]
-    bad_probs = [avg_transition_prob(l, counts) for l in open('bad.txt')]
+    good_probs = [avg_transition_prob(l, counts) for l in open(goodfile)]
+    bad_probs = [avg_transition_prob(l, counts) for l in open(badfile)]
 
     # Assert that we actually are capable of detecting the junk.
     assert min(good_probs) > max(bad_probs)
 
     # And pick a threshold halfway between the worst good and best bad inputs.
     thresh = (min(good_probs) + max(bad_probs)) / 2
-    pickle.dump({'mat': counts, 'thresh': thresh}, open('gib_model.pki', 'wb'))
+    pickle.dump({'mat': counts, 'thresh': thresh}, open(outfile, 'wb'))
 
 def avg_transition_prob(l, log_prob_mat):
     """ Return the average transition prob from l through log_prob_mat. """
