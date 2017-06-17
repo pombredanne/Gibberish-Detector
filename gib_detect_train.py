@@ -1,11 +1,12 @@
 #!/usr/bin/python
 #
 # 12Jun2017 Petr Janata - added srcfile and outfile 
+# 17Jun2107 Petr Janata - expanded set of accepted characters to include digits and hyphen
 
 import math
 import pickle
 
-accepted_chars = 'abcdefghijklmnopqrstuvwxyz '
+accepted_chars = 'abcdefghijklmnopqrstuvwxyz0123456789- '
 
 pos = dict([(char, idx) for idx, char in enumerate(accepted_chars)])
 
