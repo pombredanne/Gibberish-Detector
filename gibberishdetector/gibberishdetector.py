@@ -86,7 +86,7 @@ def train(bigfile='big.txt', goodfile='good.txt', badfile='bad.txt'):
     thresh = (min(good_probs) + max(bad_probs)) / 2
     pickle.dump({'mat': counts, 'thresh': thresh}, open(model_path, 'w'))
 
-def predict_gibberish(text):
+def detect_gibberish(text):
     train_if_necessary()
     model_data = pickle.load(open(model_path, 'r'))
     mat = model_data['mat']
