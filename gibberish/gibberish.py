@@ -116,3 +116,7 @@ class Gibberish(object):
                 gibberish_count += 1
 
         return float(gibberish_count) / float(len(words))
+
+    def gibberish_pct(self, text):
+        text = ''.join(self.normalize(text))
+        return self.avg_transition_prob(text, self.mat)
