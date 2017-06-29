@@ -57,7 +57,8 @@ def avg_transition_prob(l, log_prob_mat):
     return math.exp(log_prob / (transition_ct or 1))
 
 
-def train(bigfile=script_dir + 'data/big.txt', goodfile=script_dir + 'data/good.txt', badfile=script_dir + 'data/bad.txt'):
+def train(bigfile=script_dir + 'data/big.txt', goodfile=script_dir + 'data/good.txt',
+          badfile=script_dir + 'data/bad.txt'):
     """ Write a simple model as a pickle file """
     k = len(accepted_chars)
     # Assume we have seen 10 of each character pair.  This acts as a kind of
@@ -95,19 +96,19 @@ def train(bigfile=script_dir + 'data/big.txt', goodfile=script_dir + 'data/good.
     pickle.dump({'mat': counts, 'thresh': thresh}, open(model_path, 'w'))
 
 
-
 def detect_gibberish(text):
-    try:
-        text = text.encode()
-    finally:
-        train_if_necessary()
-        model_data = pickle.load(open(model_path, 'r'))
-        mat = model_data['mat']
-        threshold = model_data['thresh']
+    train_if_necessary()
+    model_data = pickle.load(open(model_path, 'r'))
+    mat = model_data['mat']
+    threshold = model_data['thresh']
+
+    text = ''.join(normalize(text))
 
     return avg_transition_prob(text, mat) < threshold
 
+
 def percent_gibberish(text):
+    text = ''.join(normalize(text))
     text = text.strip()
     words = text.split(' ')
     if len(words) == 0:
@@ -118,5 +119,4 @@ def percent_gibberish(text):
         if detect_gibberish(word):
             gibberish_count += 1
 
-    return float(gibberish_count)/float(len(words))
-
+    return float(gibberish_count) / float(len(words))
