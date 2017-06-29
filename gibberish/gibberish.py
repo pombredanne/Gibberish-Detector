@@ -20,7 +20,7 @@ class Gibberish(object):
         self.train_if_necessary()
 
     def train_if_necessary(self):
-        if not Path(model_path).is_file(self):
+        if not Path(model_path).is_file():
             self.train()
         else:
             self.load_persisted_model()
@@ -32,7 +32,7 @@ class Gibberish(object):
     def load_persisted_model(self):
         with open(model_path, 'r') as f:
             persisted_model = pickle.load(f)
-            for key, value in persisted_model.iteritems(self):
+            for key, value in persisted_model.iteritems():
                 setattr(self, key, value)
 
     def normalize(self, line):
