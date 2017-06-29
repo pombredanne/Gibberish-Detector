@@ -1,3 +1,3 @@
-from gibberish import detect_gibberish
+from gibberish import detect_gibberish, percent_gibberish
 
-__all__ = ['detect_gibberish']
+__all__ = ['detect_gibberish', 'percent_gibberish']

@@ -6,20 +6,24 @@
 import math
 import pickle
 from pathlib2 import Path
+import os
 
 accepted_chars = 'abcdefghijklmnopqrstuvwxyz0123456789- '
 
 pos = dict([(char, idx) for idx, char in enumerate(accepted_chars)])
-model_path = 'gib_model.pki'
+script_dir = os.path.dirname(__file__) + '/'
+model_path = script_dir + 'data/gib_model.pki'
 
 
 def train_if_necessary():
     if not Path(model_path).is_file():
         train()
 
+
 def persist_model():
     with open(model_path, 'w') as f:
         pickle.dump(vars(self), f)
+
 
 def load_persisted_model():
     with open(model_path, 'r') as f:
@@ -27,17 +31,20 @@ def load_persisted_model():
         for key, value in persisted_model.iteritems():
             setattr(self, key, value)
 
+
 def normalize(line):
     """ Return only the subset of chars from accepted_chars.
     This helps keep the  model relatively small by ignoring punctuation, 
     infrequenty symbols, etc. """
     return [c.lower() for c in line if c.lower() in accepted_chars]
 
+
 def ngram(n, l):
     """ Return all n grams from l after normalizing """
     filtered = normalize(l)
     for start in range(0, len(filtered) - n + 1):
         yield ''.join(filtered[start:start + n])
+
 
 def avg_transition_prob(l, log_prob_mat):
     """ Return the average transition prob from l through log_prob_mat. """
@@ -49,7 +56,8 @@ def avg_transition_prob(l, log_prob_mat):
     # The exponentiation translates from log probs to probs.
     return math.exp(log_prob / (transition_ct or 1))
 
-def train(bigfile='big.txt', goodfile='good.txt', badfile='bad.txt'):
+
+def train(bigfile=script_dir + 'data/big.txt', goodfile=script_dir + 'data/good.txt', badfile=script_dir + 'data/bad.txt'):
     """ Write a simple model as a pickle file """
     k = len(accepted_chars)
     # Assume we have seen 10 of each character pair.  This acts as a kind of
@@ -86,10 +94,29 @@ def train(bigfile='big.txt', goodfile='good.txt', badfile='bad.txt'):
     thresh = (min(good_probs) + max(bad_probs)) / 2
     pickle.dump({'mat': counts, 'thresh': thresh}, open(model_path, 'w'))
 
-def detect_gibberish(text):
-    train_if_necessary()
-    model_data = pickle.load(open(model_path, 'r'))
-    mat = model_data['mat']
-    threshhold = model_data['thresh']
 
-    return avg_transition_prob(text, mat) > threshold
+
+def detect_gibberish(text):
+    try:
+        text = text.encode()
+    finally:
+        train_if_necessary()
+        model_data = pickle.load(open(model_path, 'r'))
+        mat = model_data['mat']
+        threshold = model_data['thresh']
+
+    return avg_transition_prob(text, mat) < threshold
+
+def percent_gibberish(text):
+    text = text.strip()
+    words = text.split(' ')
+    if len(words) == 0:
+        return 0
+
+    gibberish_count = 0
+    for word in words:
+        if detect_gibberish(word):
+            gibberish_count += 1
+
+    return float(gibberish_count)/float(len(words))
+
