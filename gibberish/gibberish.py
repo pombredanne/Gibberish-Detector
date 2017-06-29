@@ -15,108 +15,104 @@ script_dir = os.path.dirname(__file__) + '/'
 model_path = script_dir + 'data/gib_model.pki'
 
 
-def train_if_necessary():
-    if not Path(model_path).is_file():
-        train()
+class Gibberish(object):
+    def __init__(self):
+        self.train_if_necessary()
 
+    def train_if_necessary(self):
+        if not Path(model_path).is_file(self):
+            self.train()
+        else:
+            self.load_persisted_model()
 
-def persist_model():
-    with open(model_path, 'w') as f:
-        pickle.dump(vars(self), f)
+    def persist_model(self):
+        with open(model_path, 'w') as f:
+            pickle.dump(vars(self), f)
 
+    def load_persisted_model(self):
+        with open(model_path, 'r') as f:
+            persisted_model = pickle.load(f)
+            for key, value in persisted_model.iteritems(self):
+                setattr(self, key, value)
 
-def load_persisted_model():
-    with open(model_path, 'r') as f:
-        persisted_model = pickle.load(f)
-        for key, value in persisted_model.iteritems():
-            setattr(self, key, value)
+    def normalize(self, line):
+        """ Return only the subset of chars from accepted_chars.
+        This helps keep the  model relatively small by ignoring punctuation, 
+        infrequenty symbols, etc. """
+        return [c.lower() for c in line if c.lower() in accepted_chars]
 
+    def ngram(self, n, l):
+        """ Return all n grams from l after normalizing """
+        filtered = self.normalize(l)
+        for start in range(0, len(filtered) - n + 1):
+            yield ''.join(filtered[start:start + n])
 
-def normalize(line):
-    """ Return only the subset of chars from accepted_chars.
-    This helps keep the  model relatively small by ignoring punctuation, 
-    infrequenty symbols, etc. """
-    return [c.lower() for c in line if c.lower() in accepted_chars]
+    def avg_transition_prob(self, l, log_prob_mat):
+        """ Return the average transition prob from l through log_prob_mat. """
+        log_prob = 0.0
+        transition_ct = 0
+        for a, b in self.ngram(2, l):
+            log_prob += log_prob_mat[pos[a]][pos[b]]
+            transition_ct += 1
+        # The exponentiation translates from log probs to probs.
+        return math.exp(log_prob / (transition_ct or 1))
 
+    def train(self, bigfile=script_dir + 'data/big.txt', goodfile=script_dir + 'data/good.txt',
+              badfile=script_dir + 'data/bad.txt'):
+        """ Write a simple model as a pickle file """
+        k = len(accepted_chars)
+        # Assume we have seen 10 of each character pair.  This acts as a kind of
+        # prior or smoothing factor.  This way, if we see a character transition
+        # live that we've never observed in the past, we won't assume the entire
+        # string has 0 probability.
+        counts = [[10 for i in xrange(k)] for i in xrange(k)]
 
-def ngram(n, l):
-    """ Return all n grams from l after normalizing """
-    filtered = normalize(l)
-    for start in range(0, len(filtered) - n + 1):
-        yield ''.join(filtered[start:start + n])
+        # Count transitions from big text file, taken
+        # from http://norvig.com/spell-correct.html
+        for line in open(bigfile):
+            for a, b in self.ngram(2, line):
+                counts[pos[a]][pos[b]] += 1
 
+        # Normalize the counts so that they become log probabilities.
+        # We use log probabilities rather than straight probabilities to avoid
+        # numeric underflow issues with long texts.
+        # This contains a justification:
+        # http://squarecog.wordpress.com/2009/01/10/dealing-with-underflow-in-joint-probability-calculations/
+        for i, row in enumerate(counts):
+            s = float(sum(row))
+            for j in xrange(len(row)):
+                row[j] = math.log(row[j] / s)
 
-def avg_transition_prob(l, log_prob_mat):
-    """ Return the average transition prob from l through log_prob_mat. """
-    log_prob = 0.0
-    transition_ct = 0
-    for a, b in ngram(2, l):
-        log_prob += log_prob_mat[pos[a]][pos[b]]
-        transition_ct += 1
-    # The exponentiation translates from log probs to probs.
-    return math.exp(log_prob / (transition_ct or 1))
+        # Find the probability of generating a few arbitrarily choosen good and
+        # bad phrases.
+        good_probs = [self.avg_transition_prob(l, counts) for l in open(goodfile)]
+        bad_probs = [self.avg_transition_prob(l, counts) for l in open(badfile)]
 
+        # Assert that we actually are capable of detecting the junk.
+        assert min(good_probs) > max(bad_probs)
 
-def train(bigfile=script_dir + 'data/big.txt', goodfile=script_dir + 'data/good.txt',
-          badfile=script_dir + 'data/bad.txt'):
-    """ Write a simple model as a pickle file """
-    k = len(accepted_chars)
-    # Assume we have seen 10 of each character pair.  This acts as a kind of
-    # prior or smoothing factor.  This way, if we see a character transition
-    # live that we've never observed in the past, we won't assume the entire
-    # string has 0 probability.
-    counts = [[10 for i in xrange(k)] for i in xrange(k)]
+        # And pick a threshold halfway between the worst good and best bad inputs.
+        thresh = (min(good_probs) + max(bad_probs)) / 2
+        self.mat = counts
+        self.thresh = thresh
+        self.persist_model()
 
-    # Count transitions from big text file, taken
-    # from http://norvig.com/spell-correct.html
-    for line in open(bigfile):
-        for a, b in ngram(2, line):
-            counts[pos[a]][pos[b]] += 1
+    def detect_gibberish(self, text):
 
-    # Normalize the counts so that they become log probabilities.
-    # We use log probabilities rather than straight probabilities to avoid
-    # numeric underflow issues with long texts.
-    # This contains a justification:
-    # http://squarecog.wordpress.com/2009/01/10/dealing-with-underflow-in-joint-probability-calculations/
-    for i, row in enumerate(counts):
-        s = float(sum(row))
-        for j in xrange(len(row)):
-            row[j] = math.log(row[j] / s)
+        text = ''.join(self.normalize(text))
 
-    # Find the probability of generating a few arbitrarily choosen good and
-    # bad phrases.
-    good_probs = [avg_transition_prob(l, counts) for l in open(goodfile)]
-    bad_probs = [avg_transition_prob(l, counts) for l in open(badfile)]
+        return self.avg_transition_prob(text, self.mat) < self.threshold
 
-    # Assert that we actually are capable of detecting the junk.
-    assert min(good_probs) > max(bad_probs)
+    def percent_gibberish(self, text):
+        text = ''.join(self.normalize(text))
+        text = text.strip()
+        words = text.split(' ')
+        if len(words) == 0:
+            return 0
 
-    # And pick a threshold halfway between the worst good and best bad inputs.
-    thresh = (min(good_probs) + max(bad_probs)) / 2
-    pickle.dump({'mat': counts, 'thresh': thresh}, open(model_path, 'w'))
+        gibberish_count = 0
+        for word in words:
+            if self.detect_gibberish(word):
+                gibberish_count += 1
 
-
-def detect_gibberish(text):
-    train_if_necessary()
-    model_data = pickle.load(open(model_path, 'r'))
-    mat = model_data['mat']
-    threshold = model_data['thresh']
-
-    text = ''.join(normalize(text))
-
-    return avg_transition_prob(text, mat) < threshold
-
-
-def percent_gibberish(text):
-    text = ''.join(normalize(text))
-    text = text.strip()
-    words = text.split(' ')
-    if len(words) == 0:
-        return 0
-
-    gibberish_count = 0
-    for word in words:
-        if detect_gibberish(word):
-            gibberish_count += 1
-
-    return float(gibberish_count) / float(len(words))
+        return float(gibberish_count) / float(len(words))
