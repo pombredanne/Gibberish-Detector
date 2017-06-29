@@ -101,7 +101,7 @@ class Gibberish(object):
 
         text = ''.join(self.normalize(text))
 
-        return self.avg_transition_prob(text, self.mat) < self.threshold
+        return self.avg_transition_prob(text, self.mat) < self.thresh
 
     def percent_gibberish(self, text):
         text = ''.join(self.normalize(text))
