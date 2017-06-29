@@ -1,3 +1,3 @@
-from gibberishdetector import predict_gibberish
+from gibberishdetector import detect_gibberish
 
 __all__ = ['detect_gibberish']
