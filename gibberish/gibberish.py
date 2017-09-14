@@ -14,7 +14,7 @@ pos = dict([(char, idx) for idx, char in enumerate(accepted_chars)])
 if 'GIBBERISH_DATA_DIR' in os.environ:
     data_dir  = os.environ['GIBBERISH_DATA_DIR'] + '/'
 else:
-    data_dir =  os.path.dirname(os.path.abspath(__file__)) + '/data'
+    data_dir =  os.path.dirname(os.path.abspath(__file__)) + '/data/'
 
 model_path = data_dir + '/gib_model.pki'
 
