@@ -3,6 +3,7 @@ get_data.py
 
 # data file
 big_1.txt
+big_2.txt
 
 # pickle file
 gib_model.pki
