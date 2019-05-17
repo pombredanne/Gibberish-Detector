@@ -4,5 +4,5 @@ get_data.py
 # data file
 big_1.txt
 
-# All pickle files
-*.pki
+# pickle file
+gib_model.pki
