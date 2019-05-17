@@ -69,8 +69,3 @@ def avg_transition_prob(l, log_prob_mat):
 
 if __name__ == '__main__':
     train()
-
-
-
-    
-    
