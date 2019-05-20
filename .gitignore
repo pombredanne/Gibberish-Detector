@@ -3,6 +3,9 @@ crawler.py
 crawler_2.py
 get_data.py
 
+# Swap Files
+*.swp
+
 # data file
 big_1.txt
 big_2.txt
