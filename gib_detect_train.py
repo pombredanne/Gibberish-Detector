@@ -48,6 +48,8 @@ def train():
     # bad phrases.
     good_probs = [avg_transition_prob(l, counts) for l in open('good.txt')]
     bad_probs = [avg_transition_prob(l, counts) for l in open('bad.txt')]
+    print(good_probs)
+    print(bad_probs)
     # Assert that we actually are capable of detecting the junk.
     assert min(good_probs) > max(bad_probs)
 

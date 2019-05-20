@@ -1,9 +1,15 @@
 # get data helper
+crawler.py
+crawler_2.py
 get_data.py
 
 # data file
 big_1.txt
 big_2.txt
+try.txt
 
 # pickle file
 gib_model.pki
+
+# Cache
+__pycache__

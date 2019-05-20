@@ -9,4 +9,7 @@ while True:
     l = input()
     model_mat = model_data['mat']
     threshold = model_data['thresh']
+
+    print(gib_detect_train.avg_transition_prob(l, model_mat))
+    print(threshold)
     print(gib_detect_train.avg_transition_prob(l, model_mat) > threshold)
