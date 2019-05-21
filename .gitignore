@@ -14,5 +14,9 @@ try.txt
 # pickle file
 gib_model.pki
 
+# result file
+counts.txt
+thresh.json
+
 # Cache
 __pycache__

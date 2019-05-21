@@ -17,6 +17,7 @@ bi
 bo
 by
 da
+dg
 do
 dy
 ee
@@ -50,6 +51,7 @@ li
 lo
 ma
 me
+mk
 mi
 mo
 mu
@@ -101,6 +103,7 @@ ye
 yi
 yo
 yu
+kk
 aba
 abs
 ace
@@ -601,3 +604,8 @@ yet
 you
 zip
 zoo
+fyi
+kfc
+okk
+damn
+lmao
