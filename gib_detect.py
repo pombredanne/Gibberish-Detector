@@ -24,3 +24,4 @@ while True:
         # print(gib_detect_train.avg_transition_prob(l, model_mat))
         # print(threshold)
         print(gib_detect_train.avg_transition_prob(l, model_mat) > threshold)
+    print()
