@@ -1,4 +1,4 @@
-##Overview
+## Overview
 
 A sample program I wrote to detect gibberish.  It uses a 2 character markov chain.
 
@@ -7,7 +7,7 @@ http://en.wikipedia.org/wiki/Markov_chain
 This is a nice (IMO) answer to this guys question on stackoverflow.
 http://stackoverflow.com/questions/6297991/is-there-any-way-to-detect-strings-like-putjbtghguhjjjanika/6298040#comment-7360747
 
-##Usage
+## Usage
 
 Note: Python3 required
 
@@ -51,7 +51,7 @@ yay!
 True
 ```
 
-##How it works
+## How it works
 
 The markov chain first 'trains' or 'studies' a few MB of English text, recording how often characters appear next to each other. Eg, given the text "Rob likes hacking" it sees Ro, ob, o[space], [space]l, ... It just counts these pairs. After it has finished reading through the training data, it normalizes the counts. Then each character has a probability distribution of 27 followup character (26 letters + space) following the given initial.
 
