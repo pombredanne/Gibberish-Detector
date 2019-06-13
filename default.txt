@@ -65,7 +65,6 @@ of
 og
 oh
 oi
-ok
 om
 on
 op
@@ -609,3 +608,6 @@ kfc
 okk
 damn
 lmao
+cmu
+haha
+ok
