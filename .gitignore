@@ -20,3 +20,6 @@ thresh.json
 
 # Cache
 __pycache__
+
+# Edge Cases
+gibberish.txt

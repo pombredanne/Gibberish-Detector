@@ -611,3 +611,5 @@ lmao
 cmu
 haha
 ok
+amc
+segway
