@@ -1,23 +1,20 @@
 Overview
 ========
 
-A sample program I wrote to detect gibberish.  It uses a 2 character markov chain.
-
-http://en.wikipedia.org/wiki/Markov_chain
-
-This is a nice (IMO) answer to this guys question on stackoverflow.
-http://stackoverflow.com/questions/6297991/is-there-any-way-to-detect-strings-like-putjbtghguhjjjanika/6298040#comment-7360747
+Fork of rrenaud's [Gibberish-Detector](https://github.com/rrenaud/Gibberish-Detector) to support Python 3 and switch to 3-character [markov chain](http://en.wikipedia.org/wiki/Markov_chain).
 
 Usage
 =====
 
 First train the model:
-
+```
 python gib_detect_train.py
+```
 
 Then try it on some sample input
-
+```
 python gib_detect.py
+```
 
 my name is rob and i like to hack True
 
