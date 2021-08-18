@@ -13,11 +13,11 @@ Usage
 
 First train the model:
 
-python gib_detect_train.py
+`python gib_detect_train.py`
 
 Then try it on some sample input
 
-python gib_detect.py
+`python gib_detect.py`
 
 my name is rob and i like to hack True
 
