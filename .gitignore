@@ -1,0 +1,25 @@
+# get data helper
+crawler.py
+crawler_2.py
+get_data.py
+
+# Swap Files
+*.swp
+
+# data file
+big_1.txt
+big_2.txt
+try.txt
+
+# pickle file
+gib_model.pki
+
+# result file
+counts.txt
+thresh.json
+
+# Cache
+__pycache__
+
+# Edge Cases
+gibberish.txt
